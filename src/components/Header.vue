@@ -1,6 +1,6 @@
 <template>
-	<div :class="['d-flex align-items-center rounded mb-4 mx-4 p-2 bgc-container', {'justify-content-between': right}]">
-		<el-button @click="toggleSidebarShow" class="bi bi-list">菜单</el-button>
+	<div :class="['d-flex align-items-center rounded mb-4 mx-4 p-2 nav-home', {'justify-content-between': right}]">
+		<button @click="toggleSidebarShow" class="bi bi-list active-btn" text bg>菜单</button>
 		<div>
 			<slot></slot>
 		</div>
@@ -8,6 +8,9 @@
 </template>
 
 <script>
+
+import '../assets/css/active-btn.css'
+
 export default{
     data(){
 		return{
@@ -20,9 +23,10 @@ export default{
 			default: {},
 		},
 	},
+	inject: ['toggleSidebarShow'],
 	methods:{
-		toggleSidebarShow(){
-			
+		handleToggleSidebarShow(){
+			this.toggleSidebarShow()
 		}
 	}
 }
