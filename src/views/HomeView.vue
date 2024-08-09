@@ -7,48 +7,55 @@
 		</span>
 	</HEADER>
   
-	<!-- <section class="text-center">
+	<section class="p-2 ps-3 rounded-3 nav-home">
 		<h1>FloodGuard</h1>
 		<h4>城市内涝隐患管理信息系统</h4>
 	</section>
   
-	<el-row :gutter="25" class="my-4">
+	<el-row :gutter="25" class="my-3">
 		<el-col :xs="24" :sm="16">
-			<CONTAINER title="概览" :center="true">
+			<CONTAINER title="概览" :center="true" class="nav-home">
 				<el-row>
 					<el-col v-for="(item, index) in data" :key="index" :span="6">
-					{{ item.name }}
-					<div class="text-primary fs-4">{{ item.value }}</div>
+						<span>{{ item.name }}</span>
+						<div class="text-primary fs-4">{{ item.value }}</div>
 					</el-col>
 				</el-row>
 			</CONTAINER>
 		
-			<CONTAINER title="内涝地图" minHeight="600px" :center="true">
+			<CONTAINER class="nav-home" title="内涝地图" minHeight="600px" :center="true">
 				<img src="../assets/map.jpg" style="height: 300px;" />
 			</CONTAINER>
 		</el-col>
   
 	  	<el-col :xs="24" :sm="8">
-			<CONTAINER title="公告" minHeight="400px">
-				<div v-if="notice.length === 0" class="text-center pt-5">
-					<el-icon size="100px"><Box /></el-icon>
+			<CONTAINER class="nav-home" title="公告" minHeight="400px">
+				<div v-if="notice.length === 0" class="text-center" style="margin-top: calc(50% - 40px);">
+					<div><el-icon size="50px"><Box /></el-icon></div>
 					<div>空空如也</div>
 				</div>
-				<el-card v-else v-for="(item, index) in notice" :key="index" shadow="hover">
+				<!-- <el-card v-else v-for="(item, index) in notice" :key="index" shadow="hover">
 					<h5>{{ item.title }}</h5>
 					<div class="text item">{{ item.content }}</div>
-				</el-card>
+				</el-card> -->
+				<div class="notice-box" v-for="(item, index) in notice" :key="index">
+					<div class="notice-item">
+						<h5>{{ item.title }}</h5>
+						<div>{{ item.content }}</div>
+					</div>
+				</div>
 			</CONTAINER>
 		</el-col>
-	</el-row> -->
+	</el-row>
 </template>
   
 <script>
-import CONTAINER from '@/components/Container.vue';
-import HEADER from '@/components/Header.vue';
+import CONTAINER from '@/components/Container.vue'
+import HEADER from '@/components/Header.vue'
 // import apiClient from '@/axios';
 
 import '../assets/css/active-btn.css'
+import '@/style.css'
   
 export default{
 	components: { 
@@ -98,5 +105,15 @@ export default{
 	border-radius: 5px;
 	padding: 8px;
 	font-size: 0.9rem;
+}
+
+.notice-item{
+	background: #fff;
+	padding: 10px;
+	border-bottom: 1px dashed #0d6efd;
+}
+
+.notice-box:last-child .notice-item {
+  border-bottom: none;
 }
 </style>
