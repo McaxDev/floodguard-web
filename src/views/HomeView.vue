@@ -1,13 +1,13 @@
 <template>
-	<Header right="true">
+	<HEADER right="true">
 		<span v-for="(item, index) in head" :key="index">
-			<a :href="item.link" :class="'bi text-decoration-none fw-medium mx-3 ' + item.icon">
+			<a class="links" :href="item.link" :class="'text-decoration-none mx-1 active-btn ' + item.icon" style="font-weight: normal;">
 				&nbsp;{{ item.name }}
 			</a>
 		</span>
-	</Header>
+	</HEADER>
   
-	<section class="text-center">
+	<!-- <section class="text-center">
 		<h1>FloodGuard</h1>
 		<h4>城市内涝隐患管理信息系统</h4>
 	</section>
@@ -40,13 +40,15 @@
 				</el-card>
 			</CONTAINER>
 		</el-col>
-	</el-row>
+	</el-row> -->
 </template>
   
 <script>
 import CONTAINER from '@/components/Container.vue';
 import HEADER from '@/components/Header.vue';
 // import apiClient from '@/axios';
+
+import '../assets/css/active-btn.css'
   
 export default{
 	components: { 
@@ -86,3 +88,15 @@ export default{
 	}
 }
 </script>
+
+<style scoped>
+.links{
+	text-decoration: none;
+	color: #434343;
+	background: #f7f7f7;
+	transition: 0.2s ease;
+	border-radius: 5px;
+	padding: 8px;
+	font-size: 0.9rem;
+}
+</style>
