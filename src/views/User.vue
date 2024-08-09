@@ -31,15 +31,15 @@
 						<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" label-position="top">
 							<h3 class="mt-3 mb-3">请登录</h3>
 							<el-form-item label="用户名" prop="userName">
-								<el-input v-model="ruleForm.userName"></el-input>
+								<el-input size="large" v-model="ruleForm.userName"></el-input>
 							</el-form-item>
 							<el-form-item label="密码" prop="password">
-								<el-input v-model="ruleForm.password"></el-input>
+								<el-input size="large" v-model="ruleForm.password"></el-input>
 							</el-form-item>
 							<el-form-item class="mb-0">
-								<el-button class="w-100" color="#0d6dfd" @click="submitForm('ruleForm')">登录</el-button>
+								<el-button size="large" class="w-100" color="#0d6dfd" @click="submitForm('ruleForm')">登录</el-button>
 							</el-form-item>
-							<el-form-item>
+							<el-form-item class="mt-2">
 								<small>没有账号？</small><el-button type="primary" link @click="()=>{logOrRes='res'}"><small>点我注册</small></el-button>
 							</el-form-item>
 						</el-form>
@@ -50,21 +50,21 @@
 						<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" label-position="top">
 							<h3 class="mt-3 mb-3">注册账号...</h3>
 							<el-form-item label="用户名" prop="userName">
-								<el-input v-model="ruleForm.userName"></el-input>
+								<el-input size="large" v-model="ruleForm.userName"></el-input>
 							</el-form-item>
 							<el-form-item label="密码" prop="password">
-								<el-input v-model="ruleForm.password"></el-input>
+								<el-input size="large" v-model="ruleForm.password"></el-input>
 							</el-form-item>
 							<el-form-item label="邮箱" prop="email">
-								<el-input v-model="ruleForm.email"></el-input>
+								<el-input size="large" v-model="ruleForm.email"></el-input>
 							</el-form-item>
 							<el-form-item label="简介" prop="introduction">
-								<el-input v-model="ruleForm.introduction"></el-input>
+								<el-input size="large" v-model="ruleForm.introduction"></el-input>
 							</el-form-item>
 							<el-form-item class="mb-0">
-								<el-button class="w-100" color="#0d6dfd" @click="submitForm('ruleForm')">注册</el-button>
+								<el-button size="large" class="w-100" color="#0d6dfd" @click="submitForm('ruleForm')">注册</el-button>
 							</el-form-item>
-							<el-form-item>
+							<el-form-item class="mt-2">
 								<small>已有账号？</small><el-button type="primary" link @click="()=>{logOrRes='log'}"><small>点我登录</small></el-button>
 							</el-form-item>
 						</el-form>
@@ -139,7 +139,7 @@ export default{
 .logres-box{
 	padding: 40px;
 	/* background: #ffffff; */
-	background: #e9e9e9d5;
+	background: #ffffffc2;
 	backdrop-filter: blur(7px);
 	border-radius: 10px;
 	box-shadow: 2px 2px 12px 1px rgba(0, 0, 0, 0.15);
