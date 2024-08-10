@@ -18,10 +18,9 @@ export default{
 		}
     },
 	props:{
-		right:{
-			type: {},
-			default: {},
-		},
+		right:{},
+		type: {},
+		default: {},
 	},
 	inject: ['toggleSidebarShow'],
 	methods:{

@@ -88,6 +88,8 @@
 
 .nav-galss{
 	/* padding: 10px; */
+	/* max-height: 100vh;
+	overflow-y: auto; */
 }
 
 .is-active{
