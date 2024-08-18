@@ -11,117 +11,72 @@
       <table class="w-100 p-2 mb-auto" style="margin-top: -40px;">
         <thead>
           <tr>
-            <td v-for="item in fields" :key="item.key">{{ item.title }}</td>
+            <td v-for="item in fields" :key="item.key" class="text-truncate">{{ item.title }}</td>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item,id) in datas" :key="id" @contextmenu.prevent="rightClick($event,item)">
+          <div v-if="datas.length===0" style="position: sticky;left: 50%; transform: translateX(-50%);">
+            <el-empty class="w-100" description="暂无数据"/>
+          </div>
+          <tr v-else v-for="(item,id) in datas" :key="id" @contextmenu.prevent="rightClick($event,item)">
             <td v-for="field in fields" :key="field.key">{{ item[field.key] }}</td>
           </tr>
         </tbody>
       </table>
       <div class="edit-el-pagination mt-auto">
-        <el-pagination background layout="prev, pager, next" :total="50" />
+        <el-pagination background layout="prev, pager, next" :total="counts" :current-page="nowPage" @current-change="changePage"/>
       </div>
     </div>
     <div v-if="isRightClickMenuShow" class="right-click-menu" :style="{'position':'fixed','left':rightClickMenu.x,'top':rightClickMenu.y}">
-      <div class="right-click-menu-item">编辑</div>
-      <div class="right-click-menu-item">删除</div>
+      <div class="right-click-menu-item" @click="edit">编辑</div>
+      <div class="right-click-menu-item" @click="del">删除</div>
     </div>
+    <el-drawer v-model="drawer" :show-close="false" title="编辑数据" size="40%" @close="cancelEdit">
+      <el-form :model="nowRightClickChose" label-width="100px" label-position="top">
+        <el-form-item v-if="nowRightClickChose" v-for="item in fields" :key="item.key" :label="item.title" :prop="item.key">
+          <el-input size="large" v-model="nowRightClickChose[item.key]"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div style="flex: auto">
+          <el-button @click="drawer=false">取消</el-button>
+          <el-button type="primary" @click="confirmEdit">确认修改</el-button>
+        </div>
+      </template>
+    </el-drawer>
   </div>
 </template>
-  
+
 <script>
+import { markRaw } from 'vue'
+import http from '../utils/http'
+
 export default{
   data(){
     return{
       rightClickMenu:{},
       isRightClickMenuShow:false,
-      activePanel:'内涝事件',
-      panelOptions:['内涝事件','历史信息','公告','地区','传感器状态','传感器','用户'],
-      fields:[
-        {
-          key:'id',
-          title:'编号'
-        },
-        {
-          key:'name',
-          title:'名字'
-        },
-        {
-          key:'birth',
-          title:'出生年月'
-        },
-        {
-          key:'gender',
-          title:'性别'
-        },
+      activePanel:'/floodevent',
+      panelOptions:[
+        {"label": "内涝事件", "value": "/floodevent"},
+        {"label": "历史信息", "value": "/historydata"},
+        {"label": "公告", "value": "/notice"},
+        {"label": "地区", "value": "/region"},
+        {"label": "传感器状态", "value": "/sensorstatus"},
+        {"label": "传感器", "value": "/sensor"},
+        {"label": "用户", "value": "/user"}
       ],
-      datas: [
-        {
-            id: '001',
-            name: 'Alice Johnson',
-            birth: '1992-07-16',
-            gender: 'Female'
-        },
-        {
-            id: '002',
-            name: 'Bob Smith',
-            birth: '1985-09-23',
-            gender: 'Male'
-        },
-        {
-            id: '003',
-            name: 'Carol Taylor',
-            birth: '1990-11-12',
-            gender: 'Female'
-        },
-        {
-            id: '004',
-            name: 'David Lee',
-            birth: '1988-04-05',
-            gender: 'Male'
-        },
-        {
-            id: '005',
-            name: 'Eva Roberts',
-            birth: '1995-01-09',
-            gender: 'Female'
-        },
-        {
-            id: '006',
-            name: 'Frank Green',
-            birth: '1982-06-30',
-            gender: 'Male'
-        },
-        {
-            id: '007',
-            name: 'Gloria Adams',
-            birth: '1989-03-17',
-            gender: 'Female'
-        },
-        {
-            id: '008',
-            name: 'Henry Miller',
-            birth: '1993-08-25',
-            gender: 'Male'
-        },
-        {
-            id: '009',
-            name: 'Ivy Wilson',
-            birth: '1991-05-29',
-            gender: 'Female'
-        },
-        {
-            id: '010',
-            name: 'Jack Brown',
-            birth: '1986-12-16',
-            gender: 'Male'
-        }
-      ]
+      fields:[],
+      datas: [],
+      counts:0,
+      nowPage:1,
+      orignData:markRaw({}),
+      nowRightClickChose:null,
+      drawer:false,
     }
   },
   mounted() {
+    this.handleDatas('get','get')
     // 鼠标左键点击
     window.addEventListener('click', this.rightClickClose)
     // 鼠标滚轮
@@ -135,7 +90,8 @@ export default{
         x:`${window.innerWidth-e.clientX<=200?e.clientX-160:e.clientX}px`,
         y:`${window.innerHeight-e.clientY<=120?e.clientY-100:e.clientY}px`
       }
-      console.log(item)
+      this.nowRightClickChose=item
+      this.orignData=markRaw({...item})
     },
     rightClickClose(){//关闭右键菜单
       this.isRightClickMenuShow=false
@@ -143,7 +99,75 @@ export default{
         x:`0px`,
         y:`0px`
       }
+    },
+    handleDatas(type,link,data){
+      let url
+      if(type==='get'){
+        url=`/${link+this.activePanel}?limit=10&page=${this.nowPage}`
+      }else if(type==='post'){
+        url=`/${link+this.activePanel}`
+      }
+      // console.log(data)
+      http[type](url,data)
+        .then(res=>{
+          console.log(res.data)
+          if(type==='get'){
+            this.fields=res.data.field
+            this.datas=res.data.data
+            this.counts=res.data.count
+          }else if(type==='post'){
+            console.log(res)
+            if(link==='delete'){
+              this.handleDatas('get','get')
+            }else if(link==='edit'){
+              this.handleDatas('get','get')
+            }
+            this.nowRightClickChose=null
+          }
+        })
+    },
+    changePage(page){
+      this.nowPage=page
+      this.handleDatas('get','get')
+    },
+    edit(){
+      this.drawer=true
+    },
+    cancelEdit(){
+      this.datas.forEach(item=>{
+        if(item.ID==this.orignData.ID){
+          Object.assign(item, this.orignData)
+        }
+      })
       this.nowRightClickChose=null
+      this.orignData=markRaw({})
+    },
+    confirmEdit(){
+      this.handleDatas('post','edit',this.nowRightClickChose)
+    },
+    del(){
+      console.log('del',this.nowRightClickChose)
+      this.$msgbox.confirm(
+        `你确定要删除当前条目的数据吗？此操作不可撤回`,
+        '警告',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          console.log([this.nowRightClickChose.ID])
+          this.handleDatas('post','delete',[this.nowRightClickChose.ID])
+        })
+        .catch((err)=>{
+          // console.log(err)
+        })
+    }
+  },
+  watch:{
+    activePanel(newVal){
+      this.handleDatas('get','get')
     },
   },
 }
@@ -294,6 +318,19 @@ tr td:last-child {
     &:hover{
       box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
       color: #434343;
+    }
+    &:active{
+      box-shadow: inset 2px 2px 12px 1px rgba(0, 0, 0, 0.1);
+    }
+  }
+  .more{
+    transition: 0.2s ease;
+    border-radius: 10px;
+    background: #ffffff00 !important;
+    margin: 0 5px !important;
+    &:hover{
+      box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
+      color: #0d6dfd;
     }
     &:active{
       box-shadow: inset 2px 2px 12px 1px rgba(0, 0, 0, 0.1);
