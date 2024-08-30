@@ -32,11 +32,15 @@
 	<div class="flex-grow-1 overflow-y-auto p-4 bgc-bg">
 		<RouterView />
 	</div>
+	<div style="position: fixed;bottom: 30px;right: 30px;">
+		<el-button type="success" plain @click="testApi">testApi</el-button>
+	</div>
 </template>
   
 <script>
 import '@/style.css'
 import './js/css-doodle.min.js'
+import http from './utils/http'
 // import { $router.options.routes } from '@/router/index.js'
 
 export default{
@@ -65,6 +69,15 @@ export default{
 		handleResize() {
 			this.showMenu = window.innerWidth > 768
 			this.collapseMenu = window.innerWidth < 1200
+		},
+		testApi(){
+			http.post('/delete/floodevent',[1,2])
+				.then(res=>{
+					console.log(res)
+				})
+				.catch(err=>{
+					console.log(err)
+				})
 		}
 	},
 	mounted() {
