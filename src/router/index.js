@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import {HomeFilled, Histogram, Search, Document, Cpu, Files, UserFilled } from '@element-plus/icons-vue'
+import {HomeFilled, Histogram, Search, Document, Cpu, Files, UserFilled,Tools } from '@element-plus/icons-vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,7 +26,7 @@ const router = createRouter({
       path: '/documentation',
       name: '接口文档',
       icon: Document,
-      component: () => import('../views/Documention.vue')
+      component: () => import('../views/documentation.vue')
     },
     {
       path: '/analysis',
@@ -45,6 +45,12 @@ const router = createRouter({
       name: '用户中心',
       icon: UserFilled,
       component: () => import('../views/User.vue')
+    },
+    {
+      path: '/setting',
+      name: '应用设置',
+      icon: Tools,
+      component: () => import('../views/Setting.vue')
     }
   ]
 })
