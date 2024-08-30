@@ -27,7 +27,7 @@
         <el-pagination background layout="prev, pager, next" :total="counts" :current-page="nowPage" @current-change="changePage"/>
       </div>
     </div>
-    <div v-if="isRightClickMenuShow" class="right-click-menu" :style="{'position':'fixed','left':rightClickMenu.x,'top':rightClickMenu.y}">
+    <div v-if="isRightClickMenuShow&&userStore.$state.userInfo.admin" class="right-click-menu" :style="{'position':'fixed','left':rightClickMenu.x,'top':rightClickMenu.y}">
       <div class="right-click-menu-item" @click="edit">编辑</div>
       <div class="right-click-menu-item" @click="del">删除</div>
     </div>
@@ -50,10 +50,12 @@
 <script>
 import { markRaw } from 'vue'
 import http from '../utils/http'
+import { userStore } from '../stores/user'
 
 export default{
   data(){
     return{
+      userStore:userStore(),
       rightClickMenu:{},
       isRightClickMenuShow:false,
       activePanel:'/floodevent',
