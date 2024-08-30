@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+// import { createPinia } from 'pinia'
+import { pinia } from './utils/http'
 
 import ElementPlus from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
@@ -22,7 +23,11 @@ Object.keys(ElementPlusIconsVue).forEach(key => {
   app.component(key, ElementPlusIconsVue[key])
 })
 
-app.use(createPinia())
+// const pinia = createPinia()
+
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')
+
+export { pinia }
