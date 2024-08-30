@@ -36,6 +36,13 @@
 							<el-form-item label="密码" prop="password">
 								<el-input size="large" v-model="ruleForm.password"></el-input>
 							</el-form-item>
+							<el-form-item label="验证码" prop="code">
+								<el-input size="large" v-model="ruleForm.code">
+									<template #suffix>
+										<el-button link @click="getImgCode"><img style="width: auto;height: 26px;" :src="imgCode"/></el-button>
+									</template>
+								</el-input>
+							</el-form-item>
 							<el-form-item class="mb-0">
 								<el-button size="large" class="w-100" type="primary" @click="submitForm('ruleForm')">登录</el-button>
 							</el-form-item>
@@ -58,6 +65,13 @@
 							<el-form-item label="邮箱" prop="email">
 								<el-input size="large" v-model="ruleForm.email"></el-input>
 							</el-form-item>
+							<el-form-item label="邮箱验证码" prop="code">
+								<el-input size="large" v-model="ruleForm.code">
+									<template #suffix>
+										<el-button link @click="getcode" :disabled="codeDisabled">{{ codeText }}</el-button>
+									</template>
+								</el-input>
+							</el-form-item>
 							<el-form-item label="简介" prop="introduction">
 								<el-input size="large" v-model="ruleForm.introduction"></el-input>
 							</el-form-item>
@@ -76,14 +90,22 @@
 </template>
 
 <script>
-import { Transition } from 'vue';
-import { userStore } from '../stores/counter'
+import { Transition } from 'vue'
+import { userStore } from '../stores/user'
+
+import http from '../utils/http'
+import jsCookie from 'js-cookie'
 
 export default{
     data(){
 		return{
 			userInfo:userStore(),
 			logOrRes:'log',
+			codeText:'点击获取验证码',
+			countDown:'',
+			captchaID:'',
+			imgCode:'',
+			codeDisabled:false,
 			ruleForm: {
 				userName: '',
 				password:'',
@@ -104,21 +126,68 @@ export default{
 						message: '请输入有效的邮箱地址', 
 						trigger: ['blur', 'change'] 
 					}
-				]
+				],
+				code: [
+					{ required: true, message: '请输入验证码', trigger: 'blur' },
+					{ min: 6, max: 6, message: '请输入六位验证码', trigger: 'blur' }
+				],
 			},
 		}
     },
 	mounted(){
-		
+		this.getImgCode()
 	},
 	methods:{
 		submitForm(formName){
 			this.$refs[formName].validate((valid) => {
 				if (valid) {
 					if(this.logOrRes==='log'){
-						console.log('log')
+						const query = {
+							Username:this.ruleForm.userName,
+							Password:this.ruleForm.password,
+							CaptchaId:this.captchaID,
+							CaptchaValue:this.ruleForm.code,
+						}
+						http.post('/login',query)
+							.then(res=>{
+								console.log(res)
+								this.$message({
+									message: res.data.msg,
+									type: 'success',
+									plain: true,
+								})
+								const userInfox = {
+									admin:res.data.data.admin,
+									email:res.data.data.email,
+									username:res.data.data.userName,
+								}
+								jsCookie.set('X-Floodguard-Token',res.data.data.token)
+								this.userInfo.login(userInfox)
+							})
+							.catch(err=>{
+								this.$message({
+									message: res.data.msg,
+									type: 'error',
+									plain: true,
+								})
+								this.getImgCode()
+							})
 					}else if(this.logOrRes==='res'){
-						console.log('res')
+						const query = {
+							Username:this.ruleForm.userName,
+							Password:this.ruleForm.password,
+							email:this.ruleForm.email,
+							Authcode:this.ruleForm.code,
+						}
+						http.post('/signup',query)
+							.then(res=>{
+								console.log(res)
+								this.$message({
+									message: res.data.msg,
+									type: 'success',
+									plain: true,
+								})
+							})
 					}
 				} else {
 					console.log('error submit!!');
@@ -126,6 +195,49 @@ export default{
 				}
 			})
 		},
+		getcode(){
+			const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
+			if(regex.test(this.ruleForm.email)){
+				this.codeDisabled = true
+				this.countDown = 60
+				this.codeText=`请${this.countDown}秒后再试`
+
+				http.get(`/email?email=${this.ruleForm.email}`)
+					.then(res => {
+						this.$message({
+							message: res.data.msg,
+							type: 'success',
+							plain: true,
+						})
+						console.log(res)
+					})
+
+				let interval = setInterval(() => {
+					this.countDown--
+					this.codeText=`请${this.countDown}秒后再试`
+					if (this.countDown <= 0) {
+						this.codeText='获取邮箱验证码'
+						clearInterval(interval)
+						this.codeDisabled = false
+					}
+				}, 1000)
+			}else{
+				this.$message({
+					message: '请输入正确邮箱',
+					type: 'error',
+					plain: true,
+				})
+			}
+		},
+		getImgCode(){
+            http.get('/captcha',{responseType: 'blob'})
+            .then(res=>{
+                var imageBlob = new Blob([res.data], { type: 'image/png' })
+                var imageUrl = URL.createObjectURL(imageBlob)
+                this.captchaID=res.headers.get('X-Captcha-Id')
+                this.imgCode=imageUrl
+            })
+        }
 	},
 	watch:{
 		logOrRes(newVal){
