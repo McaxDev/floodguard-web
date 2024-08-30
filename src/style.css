@@ -85,10 +85,71 @@
 	--card: #ffffff;
 }
 
+
+@font-face {
+	font-family: 'pingfang';
+	src: url('./assets/pingfang.ttf') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+#app{
+	font-family: 'pingfang';
+}
+
+.el-radio{
+	--el-radio-input-border-color-hover:#0d6efd;
+}
+.el-radio__input.is-checked+.el-radio__label{
+	--el-color-primary:#0d6efd;
+}
+.el-radio__input.is-checked .el-radio__inner{
+	--el-color-primary:#0d6efd;
+	&:hover{
+		--el-color-primary:#0d6efd;
+	}
+}
+
+.el-select__wrapper{
+	background-color:#fff;
+	border-radius:10px;
+	box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0);
+	&:hover{
+		
+	}
+}
+.el-select__wrapper.is-hovering:not(.is-focused){
+	box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
+}
+.el-select__wrapper.is-focused{
+	box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
+}
+.el-popper.is-light, .el-popper.is-light .el-popper__arrow:before{
+	border: none;
+	border-radius: 10px;
+	background: #ffffffd8;
+	backdrop-filter: blur(6px);
+}
+.el-select-dropdown__item{
+	margin: 5px;
+	transition: 0.2s ease;
+	border-radius: 10px;
+	&:active{
+		box-shadow: inset 2px 2px 12px 1px rgba(0, 0, 0, 0.1) !important;
+	}
+}
+.el-select-dropdown__item.is-selected{
+	color:#0d6efd;
+}
+.el-select-dropdown__item.is-hovering{
+	background: none;
+	box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
+}
+
 .is-active{
 	color:#0d6efd !important;
 	box-shadow: 5px 2px 12px 1px rgba(0, 0, 0, 0.1);
 }
+
 
 .nav-btn{
 	transition: 0.2s ease;
