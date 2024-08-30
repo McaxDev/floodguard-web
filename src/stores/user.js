@@ -31,7 +31,6 @@ export const userStore = defineStore('userInfo', {
         introduction:'',
         email:'',
         admin:false,
-        id:-1
       }
     }
   },
